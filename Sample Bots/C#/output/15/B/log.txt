@@ -1,0 +1,10 @@
+
+08-06-2016 15:36:11:268 - I: 	Bot is sending to many do nothing commands, in order to save the game the player will plant a bomb and kill itself soon
+08-06-2016 15:36:11:268 - D: 	Executing bot with following commands C:\Development\entelect-100k.bot-runner\Sample Bots\C#\bin\Debug\SampleBot.exe B "C:\Development\entelect-100k.bot-runner\Sample Bots\C#\output\15\B"
+08-06-2016 15:36:11:268 - I: 	Executing process C:\Development\entelect-100k.bot-runner\Sample Bots\C#\bin\Debug\SampleBot.exe B "C:\Development\entelect-100k.bot-runner\Sample Bots\C#\output\15\B"
+08-06-2016 15:36:11:318 - E: 	Failure while executing bot C:\Development\entelect-100k.bot-runner\Sample Bots\C#\bin\Debug\SampleBot.exe B "C:\Development\entelect-100k.bot-runner\Sample Bots\C#\output\15\B"System.ComponentModel.Win32Exception (0x80004005): The system cannot find the file specified
+   at System.Diagnostics.Process.StartWithCreateProcess(ProcessStartInfo startInfo)
+   at System.Diagnostics.Process.Start()
+   at TestHarness.Util.ProcessHandler.StartProcessCommon() in C:\Development\entelect-100k.bot-runner\Game Engine\Bomberman\TestHarness\Util\ProcessHandler.cs:line 79
+   at TestHarness.Util.ProcessHandler.RunProcess() in C:\Development\entelect-100k.bot-runner\Game Engine\Bomberman\TestHarness\Util\ProcessHandler.cs:line 71
+   at TestHarness.TestHarnesses.Bot.BotRunner.RunBot() in C:\Development\entelect-100k.bot-runner\Game Engine\Bomberman\TestHarness\TestHarnesses\Bot\BotRunner.cs:line 67
