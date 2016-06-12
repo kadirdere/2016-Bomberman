@@ -20,7 +20,7 @@ namespace Bomberman
     {
         public ILogger Logger = new InMemoryLogger();
         private String _runLocation;
-        private BombermanEngine _engine;
+        public BombermanEngine Engine { get; private set; }
 
         public void StartNewGame(Options options)
         {
@@ -30,15 +30,15 @@ namespace Bomberman
 
             try
             {
-                _engine = new BombermanEngine { Logger = Logger };
-                _engine.GameComplete += EngineOnGameComplete;
-                _engine.RoundStarting += WriteStateFiles;
-                _engine.RoundComplete += WriteEgineInfo;
+                Engine = new BombermanEngine { Logger = Logger };
+                Engine.GameComplete += EngineOnGameComplete;
+                Engine.RoundStarting += WriteStateFiles;
+                Engine.RoundComplete += WriteEgineInfo;
 
                 if (options.Pretty)
                 {
-                    _engine.RoundStarting += engine_RoundComplete;
-                    _engine.GameStarted += EngineOnGameStarted;
+                    Engine.RoundStarting += engine_RoundComplete;
+                    Engine.GameStarted += EngineOnGameStarted;
                 }
 
                 _runLocation = !String.IsNullOrEmpty(options.Log) ? options.Log : Path.Combine(_runLocation, gameSeed.ToString());
@@ -63,10 +63,10 @@ namespace Bomberman
                     Logger.LogInfo("Registered player " + player.Name);
                 }
 
-                _engine.PrepareGame(players, gameSeed);
+                Engine.PrepareGame(players, gameSeed);
 
                 //WriteStateFiles(_engine.GetGameState(), 0);
-                _engine.StartNewGame();
+                Engine.StartNewGame();
             }
             catch (Exception ex)
             {
@@ -152,9 +152,9 @@ namespace Bomberman
             {
                 MapSeed = gameMap.MapSeed,
                 Round = gameMap.CurrentRound,
-                Winner = GetPlayerInfo(_engine.Winner),
-                Players = _engine.Players.Select(GetPlayerInfo),
-                LeaderBoard = _engine.LeaderBoard.Select(GetPlayerInfo)
+                Winner = GetPlayerInfo(Engine.Winner),
+                Players = Engine.Players.Select(GetPlayerInfo),
+                LeaderBoard = Engine.LeaderBoard.Select(GetPlayerInfo)
             };
 
             return JsonConvert.SerializeObject(roundInfo);
