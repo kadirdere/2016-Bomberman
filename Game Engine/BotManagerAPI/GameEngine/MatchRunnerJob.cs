@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using Bomberman;
+using BotManagerAPI.Common;
 using BotManagerAPI.Data;
 using GameEngine.Loggers;
 using ICSharpCode.SharpZipLib.Zip;
@@ -42,18 +43,28 @@ namespace BotManagerAPI.GameEngine
                     db.ChallengeMatches.Add(match);
                     db.SaveChanges();
 
-                    var matchLogDir = ConfigurationManager.AppSettings.Get("compMatchLogDirectory");
-                    var gameWorkDir = Path.Combine(matchLogDir, match.ChallengeMatchId.ToString());
+                    var matchLogDir = DirectorySettings.MatchDirectory;
+                    var rootWork = Path.Combine(matchLogDir, match.ChallengeMatchId.ToString());
+                    var gameWorkDir = Path.Combine(rootWork, "Game");
+                    var botsDir = Path.Combine(rootWork, "Bots");
 
                     if (Directory.Exists(gameWorkDir))
                     {
                         Directory.Delete(gameWorkDir, true);
                     }
 
-                    var paths = new String[2]
+                    Directory.CreateDirectory(botsDir);
+                    Directory.CreateDirectory(gameWorkDir);
+
+                    var bot1Dir = Path.Combine(botsDir, "A");
+                    DirectorySettings.CopyDirectory(DirectorySettings.GetBotSourcePath(player1.SubmissionId), bot1Dir, true);
+                    var bot2Dir = Path.Combine(botsDir, "B");
+                    DirectorySettings.CopyDirectory(DirectorySettings.GetBotSourcePath(player2.SubmissionId), bot2Dir, true);
+
+                    var paths = new []
                     {
-                        player1.SubmissionPath,
-                        player2.SubmissionPath
+                        bot1Dir,
+                        bot2Dir,
                     };
                     var options = new Options { BotFolders = paths, Log = gameWorkDir };
                     var game = new BombermanGame();
@@ -80,7 +91,7 @@ namespace BotManagerAPI.GameEngine
                         zipFile.Close();
                     }
 
-                    Directory.Delete(gameWorkDir, true);
+                    Directory.Delete(rootWork, true);
 
                     match.MatchLogDir = zipFilePath;
                     db.SaveChanges();

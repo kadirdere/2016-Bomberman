@@ -15,7 +15,9 @@ namespace BotManagerAPI
                 .UseSqlServerStorage("PlayerDashboardDB");
 
             app.UseHangfireDashboard();
-            app.UseHangfireServer();
+
+            var options = new BackgroundJobServerOptions { WorkerCount = 1 };
+            app.UseHangfireServer(options);
         }
     }
 }

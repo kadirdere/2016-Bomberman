@@ -6,8 +6,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
+using BotManagerAPI.Common;
 using BotManagerAPI.Data;
 using GameEngine.Loggers;
+using ICSharpCode.SharpZipLib.Core;
+using ICSharpCode.SharpZipLib.Zip;
 using TestHarness.TestHarnesses.Bot;
 using TestHarness.Util;
 
@@ -35,12 +38,23 @@ namespace BotManagerAPI.GameEngine
                     submission.BuildCompleteTimestamp = null;
                     submission.MatchCompleteTimestamp = null;
                     db.SaveChanges();
+                    Logger.LogInfo("Extracting bot");
+                    if (!submission.SubmissionPath.EndsWith(".zip"))
+                    {
+                        Logger.LogException("Bot is not zipped!");
+                        submission.BuildCompleteTimestamp = DateTime.Now;
+                        db.SaveChanges();
+                        throw new ArgumentException("Invalid zip file");
+                    }
+                    ExtractBot(submission);
 
+                    var sourcePath = DirectorySettings.GetBotSourcePath(submissionId);
+                    
                     Logger.LogInfo("Compiling bot");
                     try
                     {
-                        var botCompiler = new BotCompiler(BotMetaReader.ReadBotMeta(submission.SubmissionPath),
-                            submission.SubmissionPath, Logger);
+                        var botCompiler = new BotCompiler(BotMetaReader.ReadBotMeta(sourcePath),
+                            sourcePath, Logger);
                         submission.BuildOk = botCompiler.Compile();
                         submission.BuildCompleteTimestamp = DateTime.Now;
                     }
@@ -49,13 +63,7 @@ namespace BotManagerAPI.GameEngine
                         Logger.LogException("Failed to compile bot", ex);
                     }
 
-                    var compileLogDir = ConfigurationManager.AppSettings.Get("compileLogDirectory");
-                    Directory.CreateDirectory(compileLogDir);
-
-                    var logDir = Path.Combine(compileLogDir, (submissionId + "-compile.log"));
-                    File.WriteAllText(logDir, Logger.ReadAll(), Encoding.UTF8);
-
-                    submission.BuildLogPath = logDir;
+                    submission.BuildLogPath = WriteLogFile(submissionId);
                     db.SaveChanges();
                 }
                 catch (DbEntityValidationException e)
@@ -63,7 +71,72 @@ namespace BotManagerAPI.GameEngine
                     Console.WriteLine("Failed to compile submission " + submissionId);
                     throw;
                 }
+                catch (Exception e)
+                {
+                    Logger.LogException(e);
+                    WriteLogFile(submissionId);
+                }
 
+            }
+        }
+
+        private string WriteLogFile(int submissionId)
+        {
+            var compileLogDir = DirectorySettings.CompileLogDirectory;
+            Directory.CreateDirectory(compileLogDir);
+
+            var logDir = Path.Combine(compileLogDir, (submissionId + "-compile.log"));
+            File.WriteAllText(logDir, Logger.ReadAll(), Encoding.UTF8);
+
+            return logDir;
+        }
+
+        private void ExtractBot(Submission submission)
+        {
+            var path = Path.Combine(DirectorySettings.BotSourceDirectory, submission.SubmissionId.ToString());
+
+            if (Directory.Exists(path))
+            {
+                Directory.Delete(path, true);
+            }
+
+            Directory.CreateDirectory(path);
+
+            var zf = new ZipFile(submission.SubmissionPath);
+            try
+            {
+                ExtractZipToFolder(zf, path);
+            }
+            finally
+            {
+                zf.IsStreamOwner = true; // Makes close also shut the underlying stream
+                zf.Close(); // Ensure we release resources
+            }
+        }
+
+        public void ExtractZipToFolder(ZipFile f, string folder)
+        {
+            foreach (ZipEntry zipEntry in f)
+            {
+                if (!zipEntry.IsFile)
+                {
+                    continue;           // Ignore directories
+                }
+                var entryFileName = zipEntry.Name;
+                Logger.LogInfo("Extracting file " + entryFileName);
+
+                var buffer = new byte[4096];     // 4K is optimum
+                var zipStream = f.GetInputStream(zipEntry);
+
+                var fullZipToPath = Path.Combine(folder, entryFileName);
+                var directoryName = Path.GetDirectoryName(fullZipToPath);
+                if (!string.IsNullOrEmpty(directoryName))
+                    Directory.CreateDirectory(directoryName);
+
+                using (var streamWriter = File.Create(fullZipToPath))
+                {
+                    StreamUtils.Copy(zipStream, streamWriter, buffer);
+                }
             }
         }
     }

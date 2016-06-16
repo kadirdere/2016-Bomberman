@@ -166,6 +166,7 @@
   <ItemGroup>
     <Compile Include="App_Start\Startup.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Common\DirectorySettings.cs" />
     <Compile Include="Controllers\BotController.cs" />
     <Compile Include="Data\AppUser.cs" />
     <Compile Include="Data\AppUserDetail.cs" />

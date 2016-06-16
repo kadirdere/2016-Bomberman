@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using Bomberman;
+using BotManagerAPI.Common;
 using BotManagerAPI.Data;
 using GameEngine.Loggers;
 using ICSharpCode.SharpZipLib.Zip;
@@ -35,19 +36,28 @@ namespace BotManagerAPI.GameEngine
                     submission.MatchStarted = true;
                     db.SaveChanges();
 
-                    var referenceBotDir = ConfigurationManager.AppSettings.Get("referenceBotDirectory");
-                    var matchLogDir = ConfigurationManager.AppSettings.Get("testMatchLogDirectory");
-                    var gameWorkDir = Path.Combine(matchLogDir, submissionId.ToString());
+                    var referenceBotDir = DirectorySettings.ReferenceBotDirectory;
+                    var matchLogDir = DirectorySettings.TestMatchLogDirectory;
+                    var rootMatchDir = Path.Combine(matchLogDir, submissionId.ToString());
+
+                    var botsDir = Path.Combine(rootMatchDir, "Bots");
+                    var gameWorkDir = Path.Combine(rootMatchDir, "Game");
 
                     if (Directory.Exists(gameWorkDir))
                     {
                         Directory.Delete(gameWorkDir, true);
                     }
 
-                    var paths = new String[2]
+                    Directory.CreateDirectory(botsDir);
+                    Directory.CreateDirectory(gameWorkDir);
+
+                    var botDir = Path.Combine(botsDir, submissionId.ToString());
+                    DirectorySettings.CopyDirectory(DirectorySettings.GetBotSourcePath(submissionId), botDir, true);
+
+                    var paths = new []
                     {
                         referenceBotDir,
-                        submission.SubmissionPath
+                        botDir
                     };
                     var options = new Options { BotFolders = paths, Log = gameWorkDir };
                     var game = new BombermanGame();
@@ -74,7 +84,7 @@ namespace BotManagerAPI.GameEngine
                         zipFile.Close();
                     }
 
-                    Directory.Delete(gameWorkDir, true);
+                    Directory.Delete(rootMatchDir, true);
 
                     submission.MatchDataPath = zipFilePath;
                     db.SaveChanges();
