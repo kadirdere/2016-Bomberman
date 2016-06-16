@@ -27,7 +27,9 @@ namespace TestHarness.TestHarnesses.Bot.Runners
             var processArgs = GetProcessArguments(ParentHarness.BotMeta.RunFile, ParentHarness.PlayerEntity.Key, ParentHarness.CurrentWorkingDirectory);
             processArgs = AddAdditionalRunArgs(processArgs);
 
-            return new ProcessHandler(ParentHarness.BotDir, pythonExecutable, processArgs, ParentHarness.Logger);
+            var handler = new ProcessHandler(ParentHarness.BotDir, pythonExecutable, processArgs, ParentHarness.Logger);
+            handler.ProcessToRun.StartInfo.EnvironmentVariables.Add("PYTHONUSERBASE", ParentHarness.BotDir);
+            return handler;
         }
 
         protected override void RunCalibrationTest()
@@ -51,7 +53,7 @@ namespace TestHarness.TestHarnesses.Bot.Runners
 
         private static string GetProcessArguments(string scriptFilePath, char playerKey, string workingDirectory)
         {
-            return String.Format("\"{0}\" {1} \"{2}\"", scriptFilePath, playerKey, workingDirectory);
+            return String.Format("\"{0}\" {1} \"{2}\" --user", scriptFilePath, playerKey, workingDirectory);
         }
     }
 }

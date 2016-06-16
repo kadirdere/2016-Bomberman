@@ -36,12 +36,13 @@ namespace TestHarness.TestHarnesses.Bot.Compilers
 
         public bool RunPackageManager()
         {
+            _failed = false;
             if (!HasPackageManager()) return true;
 
             _compileLogger.LogInfo("Found package.json, doing install");
             using (var handler = new ProcessHandler(_botDir, Settings.Default.PathToNpm, "install", _compileLogger))
             {
-                handler.ProcessToRun.ErrorDataReceived += ProcessDataRecieved;
+                handler.ProcessToRun.ErrorDataReceived += ProcessErrorRecieved;
                 handler.ProcessToRun.OutputDataReceived += ProcessDataRecieved;
 
                 return handler.RunProcess() == 0 && !_failed;
@@ -56,8 +57,25 @@ namespace TestHarness.TestHarnesses.Bot.Compilers
 
         void ProcessDataRecieved(object sender, System.Diagnostics.DataReceivedEventArgs e)
         {
-            _failed = _failed || (!String.IsNullOrEmpty(e.Data) && e.Data.Contains("npm WARN EJSONPARSE"));
-            _compileLogger.LogInfo(e.Data);
+            if (!String.IsNullOrEmpty(e.Data))
+            {
+                _failed = _failed || HasNpmWarning(e.Data);
+                _compileLogger.LogInfo(e.Data);
+            }
+        }
+
+        void ProcessErrorRecieved(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        {
+            if (!String.IsNullOrEmpty(e.Data))
+            {
+                _failed = _failed || HasNpmWarning(e.Data);
+                _compileLogger.LogException(e.Data);
+            }
+        }
+
+        private static bool HasNpmWarning(String data)
+        {
+            return data.Contains("npm ERR!") || data.Contains("npm WARN EJSONPARS");
         }
     }
 }

@@ -15,6 +15,7 @@ namespace TestHarness.TestHarnesses.Bot.Compilers
         private readonly BotMeta _botMeta;
         private readonly string _botDir;
         private readonly ILogger _compileLogger;
+        private bool hasErrors;
 
         public PythonCompiler(BotMeta botMeta, string botDir, ILogger compileLogger)
         {
@@ -35,15 +36,17 @@ namespace TestHarness.TestHarnesses.Bot.Compilers
 
         public bool RunPackageManager()
         {
+            hasErrors = false;
             if (!HasPackageManager()) return true;
 
             _compileLogger.LogInfo("Found requirements.txt, doing install");
-            using (var handler = new ProcessHandler(_botDir, Settings.Default.PathToPythonPackageIndex, "install -r requirements.txt", _compileLogger))
+            using (var handler = new ProcessHandler(_botDir, Settings.Default.PathToPythonPackageIndex, "install -r requirements.txt --user", _compileLogger))
             {
-                handler.ProcessToRun.ErrorDataReceived += ProcessDataRecieved;
+                handler.ProcessToRun.StartInfo.EnvironmentVariables.Add("PYTHONUSERBASE", _botDir);
+                handler.ProcessToRun.ErrorDataReceived += ProcessErrorRecieved;
                 handler.ProcessToRun.OutputDataReceived += ProcessDataRecieved;
 
-                return handler.RunProcess() == 0;
+                return handler.RunProcess() == 0 && !hasErrors;
             }
         }
 
@@ -56,6 +59,15 @@ namespace TestHarness.TestHarnesses.Bot.Compilers
         void ProcessDataRecieved(object sender, System.Diagnostics.DataReceivedEventArgs e)
         {
             _compileLogger.LogInfo(e.Data);
+        }
+
+        void ProcessErrorRecieved(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        {
+            if (!String.IsNullOrEmpty(e.Data))
+            {
+                hasErrors = true;
+                _compileLogger.LogException(e.Data);
+            }
         }
     }
 }

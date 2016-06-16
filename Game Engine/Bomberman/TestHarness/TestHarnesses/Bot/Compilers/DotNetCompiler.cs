@@ -16,6 +16,7 @@ namespace TestHarness.TestHarnesses.Bot.Compilers
         private readonly BotMeta _botMeta;
         private readonly string _botDir;
         private readonly ILogger _compileLogger;
+        private bool hasErrors;
 
         public DotNetCompiler(BotMeta botMeta, string botDir, ILogger compileLogger)
         {
@@ -36,33 +37,44 @@ namespace TestHarness.TestHarnesses.Bot.Compilers
 
         public bool RunPackageManager()
         {
+            hasErrors = false;
             if (!HasPackageManager()) return true;
 
             _compileLogger.LogInfo("Nuget Package manager Found, running restore");
             using (var handler = new ProcessHandler(_botDir, Path.Combine(_botDir, "nuget.exe"), "restore", _compileLogger))
             {
-                handler.ProcessToRun.ErrorDataReceived += ProcessDataRecieved;
+                handler.ProcessToRun.ErrorDataReceived += ProcessErrorRecieved;
                 handler.ProcessToRun.OutputDataReceived += ProcessDataRecieved;
                     
-                return handler.RunProcess() == 0;
+                return handler.RunProcess() == 0 && !hasErrors;
             }
         }
 
         public bool RunCompiler()
         {
+            hasErrors = false;
             _compileLogger.LogInfo("Compiling bot " + _botMeta.NickName + " in location " + _botMeta.ProjectLocation + " using .Net");
-            using (var handler = new ProcessHandler(Path.Combine(_botDir, _botMeta.ProjectLocation??""), Settings.Default.PathToMSBuild, "/t:rebuild /p:Configuration=Release /p:Platform=\"Any CPU\"", _compileLogger))
+            using (var handler = new ProcessHandler(Path.Combine(_botDir, _botMeta.ProjectLocation??""), Settings.Default.PathToMSBuild, "/t:rebuild /p:Configuration=Release", _compileLogger))
             {
-                handler.ProcessToRun.ErrorDataReceived += ProcessDataRecieved;
+                handler.ProcessToRun.ErrorDataReceived += ProcessErrorRecieved;
                 handler.ProcessToRun.OutputDataReceived += ProcessDataRecieved;
 
-                return handler.RunProcess() == 0;
+                return handler.RunProcess() == 0 && !hasErrors;
             }
         }
 
         void ProcessDataRecieved(object sender, System.Diagnostics.DataReceivedEventArgs e)
         {
             _compileLogger.LogInfo(e.Data);
+        }
+
+        void ProcessErrorRecieved(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        {
+            if (!String.IsNullOrEmpty(e.Data))
+            {
+                hasErrors = true;
+                _compileLogger.LogException(e.Data);
+            }
         }
     }
 }
