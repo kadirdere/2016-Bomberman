@@ -13,7 +13,7 @@ namespace BotManagerAPI.Data
 
         public DateTime? BuildCompleteTimestamp { get; set; }
 
-        [StringLength(255)]
+        [StringLength(2000)]
         public string BuildLogPath { get; set; }
 
         public bool BuildOk { get; set; }
@@ -24,12 +24,12 @@ namespace BotManagerAPI.Data
 
         public DateTime? MatchCompleteTimestamp { get; set; }
 
-        [StringLength(255)]
+        [StringLength(2000)]
         public string MatchDataPath { get; set; }
 
         public bool MatchStarted { get; set; }
 
-        [StringLength(255)]
+        [StringLength(2000)]
         public string SubmissionPath { get; set; }
 
         public DateTime UploadTimestamp { get; set; }

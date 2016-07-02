@@ -12,7 +12,7 @@ namespace TestHarness.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "14.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "12.0.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -25,7 +25,7 @@ namespace TestHarness.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\msbuild.exe")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Program Files (x86)\\MSBuild\\14.0\\Bin\\MSBuild.exe")]
         public string PathToMSBuild {
             get {
                 return ((string)(this["PathToMSBuild"]));
@@ -34,7 +34,7 @@ namespace TestHarness.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("mvn.bat")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Maven\\apache-maven-3.3.9\\bin\\mvn.cmd")]
         public string PathToMaven {
             get {
                 return ((string)(this["PathToMaven"]));
@@ -43,7 +43,7 @@ namespace TestHarness.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("java")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Program Files\\Java\\jdk1.8.0_91\\bin\\java.exe")]
         public string PathToJava {
             get {
                 return ((string)(this["PathToJava"]));
@@ -52,7 +52,7 @@ namespace TestHarness.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("node.exe")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\NodeJS\\node.exe")]
         public string PathToNode {
             get {
                 return ((string)(this["PathToNode"]));
@@ -61,7 +61,7 @@ namespace TestHarness.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("python.exe")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Python\\Python27\\python.exe")]
         public string PathToPython2 {
             get {
                 return ((string)(this["PathToPython2"]));
@@ -70,7 +70,7 @@ namespace TestHarness.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("python.exe")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Python\\Python3\\python.exe")]
         public string PathToPython3 {
             get {
                 return ((string)(this["PathToPython3"]));
@@ -88,7 +88,7 @@ namespace TestHarness.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("X:\\NodeJS\\npm.cmd")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\NodeJS\\npm.cmd")]
         public string PathToNpm {
             get {
                 return ((string)(this["PathToNpm"]));

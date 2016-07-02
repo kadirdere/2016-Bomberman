@@ -39,8 +39,15 @@ namespace TestHarness.TestHarnesses.Bot.Compilers
             hasErrors = false;
             if (!HasPackageManager()) return true;
 
+
+            var pythonExecutable = Settings.Default.PathToPython3;
+            if (_botMeta.BotType == BotMeta.BotTypes.Python2)
+            {
+                pythonExecutable = Settings.Default.PathToPython2;
+            }
+
             _compileLogger.LogInfo("Found requirements.txt, doing install");
-            using (var handler = new ProcessHandler(_botDir, Settings.Default.PathToPythonPackageIndex, "install -r requirements.txt --user", _compileLogger))
+            using (var handler = new ProcessHandler(_botDir, "pip", " install -r requirements.txt --user", _compileLogger))
             {
                 handler.ProcessToRun.StartInfo.EnvironmentVariables.Add("PYTHONUSERBASE", _botDir);
                 handler.ProcessToRun.ErrorDataReceived += ProcessErrorRecieved;

@@ -54,7 +54,33 @@ namespace TestHarness.TestHarnesses.Bot.Compilers
         {
             hasErrors = false;
             _compileLogger.LogInfo("Compiling bot " + _botMeta.NickName + " in location " + _botMeta.ProjectLocation + " using .Net");
-            using (var handler = new ProcessHandler(Path.Combine(_botDir, _botMeta.ProjectLocation??""), Settings.Default.PathToMSBuild, "/t:rebuild /p:Configuration=Release", _compileLogger))
+
+            var arguments = "/t:rebuild /p:Configuration=Release";
+            if (_botMeta.BotType == BotMeta.BotTypes.CPlusPlus)
+            {
+                arguments += " /p:PlatformToolset=v140";
+            }
+
+            if (_botMeta.ProjectLocation != null && _botMeta.ProjectLocation.Contains("."))
+            {
+                _compileLogger.LogInfo("Targeting ms build with project file : " + _botMeta.ProjectLocation);
+                arguments += " " + _botMeta.ProjectLocation;
+            }
+            else
+            {
+                _compileLogger.LogInfo("No project file specified, it is recommended to specify the project file that msbuild should target");
+            }
+
+            var workingDir = _botDir;
+
+            if (_botMeta.ProjectLocation != null && !_botMeta.ProjectLocation.Contains("."))
+            {
+                workingDir = Path.Combine(workingDir, _botMeta.ProjectLocation);
+            }
+
+            _compileLogger.LogInfo("Setting MSBuild working directory to " + workingDir);
+
+            using (var handler = new ProcessHandler(workingDir, Settings.Default.PathToMSBuild, arguments, _compileLogger))
             {
                 handler.ProcessToRun.ErrorDataReceived += ProcessErrorRecieved;
                 handler.ProcessToRun.OutputDataReceived += ProcessDataRecieved;

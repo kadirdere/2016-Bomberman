@@ -12,11 +12,12 @@ namespace BotManagerAPI
         public void Configuration(IAppBuilder app)
         {
             GlobalConfiguration.Configuration
-                .UseSqlServerStorage("PlayerDashboardDB");
+                .UseSqlServerStorage("HangfireDB");
 
             app.UseHangfireDashboard();
 
-            var options = new BackgroundJobServerOptions { WorkerCount = 1 };
+
+            var options = new BackgroundJobServerOptions { WorkerCount = 1};
             app.UseHangfireServer(options);
         }
     }

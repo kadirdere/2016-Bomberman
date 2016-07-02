@@ -24,10 +24,9 @@ namespace BotManagerAPI.GameEngine
         {
             using (var db = new PlayerDashboardDB())
             {
+                var submission = db.Submissions.Single(x => x.SubmissionId == submissionId);
                 try
                 {
-                    var submission = db.Submissions.Single(x => x.SubmissionId == submissionId);
-
                     submission.BuildStarted = true;
                     submission.Complete = false;
                     submission.BuildOk = false;
@@ -42,29 +41,33 @@ namespace BotManagerAPI.GameEngine
                     if (!submission.SubmissionPath.EndsWith(".zip"))
                     {
                         Logger.LogException("Bot is not zipped!");
-                        submission.BuildCompleteTimestamp = DateTime.Now;
                         db.SaveChanges();
                         throw new ArgumentException("Invalid zip file");
                     }
-                    ExtractBot(submission);
+
+                    try
+                    {
+                        ExtractBot(submission);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogException("Failed to extract bot files", ex);
+                        throw;
+                    }
 
                     var sourcePath = DirectorySettings.GetBotSourcePath(submissionId);
-                    
+
                     Logger.LogInfo("Compiling bot");
                     try
                     {
                         var botCompiler = new BotCompiler(BotMetaReader.ReadBotMeta(sourcePath),
                             sourcePath, Logger);
                         submission.BuildOk = botCompiler.Compile();
-                        submission.BuildCompleteTimestamp = DateTime.Now;
                     }
                     catch (Exception ex)
                     {
                         Logger.LogException("Failed to compile bot", ex);
                     }
-
-                    submission.BuildLogPath = WriteLogFile(submissionId);
-                    db.SaveChanges();
                 }
                 catch (DbEntityValidationException e)
                 {
@@ -74,9 +77,12 @@ namespace BotManagerAPI.GameEngine
                 catch (Exception e)
                 {
                     Logger.LogException(e);
-                    WriteLogFile(submissionId);
+                    throw;
                 }
 
+                submission.BuildLogPath = WriteLogFile(submissionId);
+                submission.BuildCompleteTimestamp = DateTime.Now;
+                db.SaveChanges();
             }
         }
 
