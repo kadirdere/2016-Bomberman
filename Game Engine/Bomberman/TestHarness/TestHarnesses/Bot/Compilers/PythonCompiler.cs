@@ -47,7 +47,7 @@ namespace TestHarness.TestHarnesses.Bot.Compilers
             }
 
             _compileLogger.LogInfo("Found requirements.txt, doing install");
-            using (var handler = new ProcessHandler(_botDir, "pip", " install -r requirements.txt --user", _compileLogger))
+            using (var handler = new ProcessHandler(_botDir, pythonExecutable, "-m pip install -r requirements.txt", _compileLogger))
             {
                 handler.ProcessToRun.StartInfo.EnvironmentVariables.Add("PYTHONUSERBASE", _botDir);
                 handler.ProcessToRun.ErrorDataReceived += ProcessErrorRecieved;

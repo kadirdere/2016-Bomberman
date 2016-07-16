@@ -53,7 +53,7 @@ namespace TestHarness.TestHarnesses.Bot.Runners
 
         private static string GetProcessArguments(string scriptFilePath, char playerKey, string workingDirectory)
         {
-            return String.Format("\"{0}\" {1} \"{2}\" --user", scriptFilePath, playerKey, workingDirectory);
+            return String.Format("\"{0}\" {1} \"{2}\" ", scriptFilePath, playerKey, workingDirectory);
         }
     }
 }
