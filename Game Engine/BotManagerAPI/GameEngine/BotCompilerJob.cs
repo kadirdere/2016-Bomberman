@@ -77,7 +77,6 @@ namespace BotManagerAPI.GameEngine
                 catch (Exception e)
                 {
                     Logger.LogException(e);
-                    throw;
                 }
 
                 submission.BuildLogPath = WriteLogFile(submissionId);
