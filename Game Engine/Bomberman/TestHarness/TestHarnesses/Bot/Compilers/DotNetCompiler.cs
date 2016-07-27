@@ -58,7 +58,7 @@ namespace TestHarness.TestHarnesses.Bot.Compilers
             var arguments = "/t:rebuild /p:Configuration=Release";
             if (_botMeta.BotType == BotMeta.BotTypes.CPlusPlus)
             {
-                arguments += " /p:PlatformToolset=v140";
+                arguments += " /p:PlatformToolset=v140 /m /nr:false";
             }
 
             if (_botMeta.ProjectLocation != null && _botMeta.ProjectLocation.Contains("."))
@@ -80,13 +80,31 @@ namespace TestHarness.TestHarnesses.Bot.Compilers
 
             _compileLogger.LogInfo("Setting MSBuild working directory to " + workingDir);
 
+            bool success = false;
             using (var handler = new ProcessHandler(workingDir, Settings.Default.PathToMSBuild, arguments, _compileLogger))
             {
+                handler.ProcessToRun.StartInfo.EnvironmentVariables.Add("MSBUILDDISABLENODEREUSE", "1");
+                handler.ProcessToRun.StartInfo.EnvironmentVariables.Add("MSBUILD_NODE_CONNECTION_TIMEOUT", "0");
                 handler.ProcessToRun.ErrorDataReceived += ProcessErrorRecieved;
                 handler.ProcessToRun.OutputDataReceived += ProcessDataRecieved;
 
-                return handler.RunProcess() == 0 && !hasErrors;
+                success = handler.RunProcess() == 0 && !hasErrors;
             }
+
+            if (_botMeta.BotType == BotMeta.BotTypes.CPlusPlus)
+            {
+                _compileLogger.LogInfo("Killing mspdbsrv.exe because microsoft is being silly");
+                using (var handler = new ProcessHandler(workingDir, "taskkill", "/F /IM mspdbsrv.exe /T", _compileLogger))
+                {
+                    handler.ProcessToRun.StartInfo.EnvironmentVariables.Add("MSBUILDDISABLENODEREUSE", "1");
+                    handler.ProcessToRun.StartInfo.EnvironmentVariables.Add("MSBUILD_NODE_CONNECTION_TIMEOUT", "0");
+                    handler.ProcessToRun.ErrorDataReceived += ProcessErrorRecieved;
+                    handler.ProcessToRun.OutputDataReceived += ProcessDataRecieved;
+                    handler.RunProcess();
+                }
+            }
+
+            return success;
         }
 
         void ProcessDataRecieved(object sender, System.Diagnostics.DataReceivedEventArgs e)
