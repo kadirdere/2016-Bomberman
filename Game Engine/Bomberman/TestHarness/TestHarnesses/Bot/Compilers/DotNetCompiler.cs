@@ -58,7 +58,7 @@ namespace TestHarness.TestHarnesses.Bot.Compilers
             var arguments = "/t:rebuild /p:Configuration=Release";
             if (_botMeta.BotType == BotMeta.BotTypes.CPlusPlus)
             {
-                arguments += " /p:PlatformToolset=v140 /m /nr:false";
+                arguments = "/t:rebuild /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v140 /nr:false /p:ForceImportBeforeCppTargets=C:/CPlusPlusProperties/CPlusPlusProperties.prop";
             }
 
             if (_botMeta.ProjectLocation != null && _botMeta.ProjectLocation.Contains("."))

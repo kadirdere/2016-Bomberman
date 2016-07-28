@@ -21,6 +21,12 @@ namespace Bomberman
         public ILogger Logger = new InMemoryLogger();
         private String _runLocation;
         public BombermanEngine Engine { get; private set; }
+        public bool LimitRounds { get; set; }
+
+        public BombermanGame()
+        {
+            LimitRounds = false;
+        }
 
         public void StartNewGame(Options options)
         {
@@ -144,6 +150,16 @@ namespace Bomberman
                 File.Delete(engineLog);
 
             File.WriteAllText(engineLog, Logger.ReadAll(), new UTF8Encoding(false));
+
+            if (LimitRounds && round == 20)
+            {
+                Logger.LogInfo("Reference bot will be killed in the next round to save time");
+            }
+
+            if (LimitRounds && round > 20)
+            {
+                gameMap.RegisteredPlayerEntities.First().Killed = true;
+            }
         }
 
         private string GenerateRoundInfo(GameMap gameMap)

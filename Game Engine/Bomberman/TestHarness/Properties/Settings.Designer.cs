@@ -25,7 +25,7 @@ namespace TestHarness.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Program Files (x86)\\MSBuild\\14.0\\Bin\\MSBuild.exe")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Program Files (x86)\\MSBuild\\14.0\\Bin\\amd64\\MSBuild.exe")]
         public string PathToMSBuild {
             get {
                 return ((string)(this["PathToMSBuild"]));

@@ -13,6 +13,12 @@ using GameEngine.Loggers;
 using ICSharpCode.SharpZipLib.Zip;
 using TestHarness.TestHarnesses.Bot;
 using TestHarness.Util;
+using GameEngine.Common;
+using GameEngine.Engine;
+using GameEngine.Loggers;
+using GameEngine.Renderers;
+using Domain.Common;
+using Domain.Meta;
 
 namespace BotManagerAPI.GameEngine
 {
@@ -43,9 +49,9 @@ namespace BotManagerAPI.GameEngine
                     var botsDir = Path.Combine(rootMatchDir, "Bots");
                     var gameWorkDir = Path.Combine(rootMatchDir, "Game");
 
-                    if (Directory.Exists(gameWorkDir))
+                    if (Directory.Exists(rootMatchDir))
                     {
-                        Directory.Delete(gameWorkDir, true);
+                        Directory.Delete(rootMatchDir, true);
                     }
 
                     Directory.CreateDirectory(botsDir);
@@ -61,6 +67,7 @@ namespace BotManagerAPI.GameEngine
                     };
                     var options = new Options { BotFolders = paths, Log = gameWorkDir };
                     var game = new BombermanGame();
+                    game.LimitRounds = true;
                     game.StartNewGame(options);
 
                     submission.Complete = true;

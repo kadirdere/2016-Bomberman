@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="PathToMSBuild" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe</Value>
+      <Value Profile="(Default)">C:\Program Files (x86)\MSBuild\14.0\Bin\amd64\MSBuild.exe</Value>
     </Setting>
     <Setting Name="PathToMaven" Type="System.String" Scope="Application">
       <Value Profile="(Default)">C:\Maven\apache-maven-3.3.9\bin\mvn.cmd</Value>
